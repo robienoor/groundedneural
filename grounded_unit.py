@@ -5,8 +5,8 @@ class GroundedNeural:
 
     def __init__(self, nodes):
         self.nodes = nodes
-        self.b = self.generateMaskWeights()
-        self.w
+        self.b = self.generateMaskBiases()
+        self.w = np.ones((self.nodes, self.nodes))
 
 
     def generateMaskBiases(self):
@@ -19,15 +19,6 @@ class GroundedNeural:
 
         return b
 
-    def generateMaskWeights(self):
-
-        w = np.ones((self.nodes, self.nodes*self.nodes))
-        for i in range(self.nodes):
-            blocks = list(range(i,self.nodes*self.nodes,self.nodes))
-
-            w[blocks, i] = 0
-
-        return w
 
     def firstLayer(self, inputGraph):
 
@@ -44,14 +35,19 @@ class GroundedNeural:
 
         print('defeated_nodes: ', defeated_nodes)
 
-        print('mask_weights: ', self.w_m)
+        # Invert the defeated nodes so we can create the weight mask
+        defeated_nodes_invert = 1 - defeated_nodes
+        mask_weights = (defeated_nodes_invert * self.w).T
 
-        masked_graph = np.dot(defeated_nodes, self.w_m)
-        masked_graph = masked_graph.reshape((self.nodes, self.nodes))
+        print('mask_weights : ', mask_weights)
+        masked_bias = np.dot(defeated_nodes, self.b)
+        masked_bias = masked_bias.reshape((self.nodes, self.nodes))
 
-        print('mask_graph : ', masked_graph)
+        masked_graph = mask_weights * masked_bias
 
-        updated_graph = masked_graph + inputGraph
+        print('masked_graph: ', masked_graph)
+
+        updated_graph =  (inputGraph * mask_weights) + masked_bias
 
         print('final: ', updated_graph)
 
@@ -62,7 +58,7 @@ class GroundedNeural:
 
 
 def main():
-    graph = np.array([[0,1,0,0],[0,0,1,0],[0,0,0,1],[0,0,0,0]])
+    graph = np.array([[0,1,0,0],[0,0,1,0],[0,0,0,0],[0,0,1,0]])
 
     no_nodes = 4
 
@@ -70,7 +66,7 @@ def main():
     groundednn_layer2 = GroundedNeural(no_nodes)
     groundednn_layer3 = GroundedNeural(no_nodes)
 
-    groundednn_layer1_output = groundednn_layer1.process(graph)    
+    groundednn_layer1_output = groundednn_layer1.process(graph)     
     groundednn_layer2_output = groundednn_layer2.process(groundednn_layer1_output)  
     groundednn_layer3_output = groundednn_layer3.process(groundednn_layer2_output)  
 
