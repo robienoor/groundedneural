@@ -6,9 +6,9 @@ class GroundedNeural:
     def __init__(self, nodes):
         self.nodes = nodes
         self.b = self.generateMaskBiases()
-        self.w = np.ones((self.nodes, self.nodes))
+        self.w = self.generateMaskWeights()
 
-
+    
     def generateMaskBiases(self):
 
         b = np.zeros((self.nodes, self.nodes*self.nodes))
@@ -18,6 +18,10 @@ class GroundedNeural:
             b[i,blocks] = 1
 
         return b
+
+
+    def generateMaskWeights(self):
+        return np.ones((self.nodes, self.nodes))
 
 
     def firstLayer(self, inputGraph):
@@ -56,6 +60,9 @@ class GroundedNeural:
     def process(self, graph):
         return self.firstLayer(graph)
 
+
+def generateNetworkArchitecture(self):
+    
 
 def main():
     graph = np.array([[0,1,0,0],[0,0,1,0],[0,0,0,0],[0,0,1,0]])

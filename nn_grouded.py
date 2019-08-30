@@ -8,13 +8,23 @@ def generateGraphs(noNodes):
 
     return powerset
 
+def convertVectorToMatrixGraph(vectorGraph, noNodes):
+    return vectorGraph.reshape((noNodes, noNodes))
+
 def main():
 
     noNodes = 3 
 
     powerset = generateGraphs(noNodes)
+    graphs = []
 
-    print(powerset)
+    for indices in powerset:
+        graph =  np.zeros((noNodes*noNodes))
+        graph[list(indices)] = 1
+        graphs.append(graph)
+
+
+    print(graphs[-2:])
     print(len(powerset))
 
 
